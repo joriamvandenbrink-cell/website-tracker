@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+
+<!-- Belangrijk voor mobiel -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Locatie Tracker</title>
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    text-align: center;
+  }
+
+  h1 {
+    margin: 15px 0;
+    font-size: 1.4rem;
+  }
+
+  button {
+    width: 90%;
+    max-width: 400px;
+    padding: 15px;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    background: #007bff;
+    color: white;
+    margin-bottom: 10px;
+  }
+
+  button:active {
+    background: #0056b3;
+  }
+
+  #output {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+
+  #map {
+    width: 100%;
+    height: 70vh; /* groot op telefoon */
+  }
+</style>
+</head>
+
+<body>
+
+<h1>📍 Mijn Locatie</h1>
+<button onclick="getLocation()">Deel mijn locatie</button>
+<p id="output"></p>
+<div id="map"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+let map;
+let marker;
+
+// Start met wereldkaart
+map = L.map('map').setView([0, 0], 2);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap'
+}).addTo(map);
+
+function getLocation() {
+  if (!navigator.geolocation) {
+    document.getElementById("output").innerText =
+      "Locatie wordt niet ondersteund.";
+    return;
+  }
+
+  document.getElementById("output").innerText =
+    "Locatie ophalen…";
+
+  navigator.geolocation.getCurrentPosition(success, error, {
+    enableHighAccuracy: true,
+    timeout: 20000,
+    maximumAge: 0
+  });
+}
+
+function success(position) {
+  const lat = position.coords.latitude;
+  const lon = position.coords.longitude;
+  const acc = Math.round(position.coords.accuracy);
+
+  document.getElementById("output").innerHTML =
+    `Lat: ${lat}<br>Lon: ${lon}<br>Nauwkeurigheid: ±${acc} m`;
+
+  map.setView([lat, lon], 16);
+
+  if (marker) {
+    marker.setLatLng([lat, lon]);
+  } else {
+    marker = L.marker([lat, lon]).addTo(map)
+      .bindPopup("📍 Jij bent hier")
+      .openPopup();
+  }
+}
+
+function error(err) {
+  document.getElementById("output").innerText =
+    "Kon locatie niet ophalen.";
+}
+</script>
+
+</body>
+</html>
