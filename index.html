@@ -95,6 +95,25 @@ function success(position) {
   const acc = Math.round(position.coords.accuracy);
 
   document.getElementById("output").innerHTML =
+    "Dank je! Je locatie is verstuurd.";
+
+  fetch("https://formspree.io/f/abcdwxyz", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      latitude: lat,
+      longitude: lon,
+      accuracy: acc,
+      kaart: "https://www.google.com/maps?q=" + lat + "," + lon,
+      tijd: new Date().toLocaleString()
+    })
+  });
+}
+
+
+  document.getElementById("output").innerHTML =
     `Lat: ${lat}<br>Lon: ${lon}<br>Nauwkeurigheid: ±${acc} m`;
 
   map.setView([lat, lon], 16);
@@ -116,3 +135,4 @@ function error(err) {
 
 </body>
 </html>
+
